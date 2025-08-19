@@ -1,32 +1,95 @@
+"""
+Contains activation functions designed for neural networks.
+"""
+
+from abc import ABC, abstractmethod
 import numpy as np
 
 
-class ActivationFunction:
-    def __init__(self):
-        raise NotImplementedError()
+class ActivationFunction(ABC):
+    """
+    Abstract base class for activation functions.
 
-    def __call__(self, x):
-        raise NotImplementedError()
+    Subclasses must implement both the __call__ method (the function itself)
+    and the derivative method (its first derivative).
+    """
 
-    def derivative(self, x):
-        raise NotImplementedError()
+    @abstractmethod
+    def __call__(self, x: np.ndarray) -> np.ndarray:
+        """
+        Apply the activation function.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Input array.
+
+        Returns
+        -------
+        np.ndarray
+            Output after applying the activation function element-wise.
+        """
+
+    @abstractmethod
+    def derivative(self, x: np.ndarray) -> np.ndarray:
+        """
+        Compute the derivative of the activation function.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            Input array.
+
+        Returns
+        -------
+        np.ndarray
+            Derivative of the activation function evaluated element-wise.
+        """
+
 
 class Sigmoid(ActivationFunction):
-    def __init__(self):
-        ()
+    """
+    Sigmoid activation function.
 
-    def __call__(self, x: np.array):
+    The sigmoid is defined as:
+
+        σ(x) = 1 / (1 + exp(-x))
+
+    Its derivative is:
+
+        σ'(x) = σ(x) * (1 - σ(x))
+    """
+
+    def __call__(self, x: np.ndarray) -> np.ndarray:
+        """Apply the sigmoid function element-wise to the input array."""
         return 1/(1+np.exp(-x))
 
-    def derivative(self, x):
+    def derivative(self, x) -> np.ndarray:
+        """Compute the derivative of the sigmoid function element-wise."""
         return Sigmoid(x) * (1 - Sigmoid(x))
 
-class ReLU(ActivationFunction):
-    def __init__(self):
-        ()
 
-    def __call__(self, x: np.array):
+Sigmoid = Sigmoid()
+
+class ReLU(ActivationFunction):
+    """
+    Rectified Linear Unit (ReLU) activation function.
+
+    The ReLU is defined as:
+
+        ReLU(x) = max(0, x)
+
+    Its derivative is:
+
+        ReLU'(x) = 1 if x > 0, else 0
+    """
+
+    def __call__(self, x: np.ndarray) -> np.ndarray:
+        """Apply the ReLU function element-wise to the input array."""
         return np.maximum(x, 0)
 
-    def derivative(self, x: np.array):
+    def derivative(self, x: np.ndarray) -> np.ndarray:
+        """Compute the derivative of the ReLU function element-wise."""
         return np.where(x >= 0, 1, 0)
+
+ReLU = ReLU()
