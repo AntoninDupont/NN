@@ -21,7 +21,7 @@ class ActivationFunction(ABC):
 
         Parameters
         ----------
-        x : np.ndarray
+        x: np.ndarray
             Input array.
 
         Returns
@@ -37,7 +37,7 @@ class ActivationFunction(ABC):
 
         Parameters
         ----------
-        x : np.ndarray
+        x: np.ndarray
             Input array.
 
         Returns
@@ -61,11 +61,35 @@ class Sigmoid(ActivationFunction):
     """
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """Apply the sigmoid function element-wise to the input array."""
+        """
+        Apply the sigmoid function element-wise to the input array.
+
+        Parameters
+        ----------
+        x: np.ndarray
+            Input array.
+
+        Returns
+        -------
+        np.ndarray
+            Output after applying the activation function element-wise.
+        """
         return 1/(1+np.exp(-x))
 
     def derivative(self, x) -> np.ndarray:
-        """Compute the derivative of the sigmoid function element-wise."""
+        """
+        Compute the derivative of the sigmoid function element-wise.
+
+        Parameters
+        ----------
+        x: np.ndarray
+            Input array.
+
+        Returns
+        -------
+        np.ndarray
+            Derivative of the activation function evaluated element-wise.
+        """
         return Sigmoid(x) * (1 - Sigmoid(x))
 
 
@@ -85,11 +109,34 @@ class ReLU(ActivationFunction):
     """
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """Apply the ReLU function element-wise to the input array."""
+        """Apply the ReLU function element-wise to the input array.
+
+        Parameters
+        ----------
+        x: np.ndarray
+            Input array.
+
+        Returns
+        -------
+        np.ndarray
+            Output after applying the activation function element-wise.
+        """
         return np.maximum(x, 0)
 
     def derivative(self, x: np.ndarray) -> np.ndarray:
-        """Compute the derivative of the ReLU function element-wise."""
-        return np.where(x >= 0, 1, 0)
+        """
+        Compute the derivative of the ReLU function element-wise.
+
+        Parameters
+        ----------
+        x: np.ndarray
+            Input array.
+
+        Returns
+        -------
+        np.ndarray
+            Derivative of the activation function evaluated element-wise.
+        """
+        return np.where(x > 0, 1, 0)
 
 ReLU = ReLU()

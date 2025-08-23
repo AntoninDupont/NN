@@ -27,24 +27,28 @@ class Layer:
 
         Parameters
         ----------
-        n_inputs : int
+        n_inputs: int
             Number of input features to this layer.
-        n_neurons : int
+        n_neurons: int
             Number of neurons in this layer.
-        activation_function : ActivationFunction
+        activation_function: ActivationFunction
             Activation function object to apply on the linear combination.
-        name : str, optional
+        name: str, optional
             Optional name for the layer.
-        init_method : str, default 'random'
-            Method to initialize weights. Options: 'zeros', 'random'.
+        init_method: str, default 'random'
+            Method to initialize weights. Options: 'random', 'he', 'xavier', 'zeros'.
 
         Raises
         ------
         ValueError
-            If init_method is not 'zeros' or 'random'.
+            If init_method is not options.
         """
         if init_method == 'random':
-            self.weights = np.random.rand(n_inputs, n_neurons)
+            self.weights = np.random.rand(n_inputs, n_neurons) / 100
+        elif init_method == 'he':
+            self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(2 / n_inputs)
+        elif init_method == 'xavier':
+            self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(1 / n_inputs)
         elif init_method == 'zeros':
             self.weights = np.zeros((n_inputs, n_neurons))
         else:
@@ -62,7 +66,7 @@ class Layer:
 
         Parameters
         ----------
-        X : np.ndarray
+        x: np.ndarray
             Input data of shape (n_samples, n_inputs).
 
         Returns
@@ -80,9 +84,9 @@ class Layer:
 
         Parameters
         ----------
-        da : np.ndarray
+        da: np.ndarray
             Gradient of the loss with respect to the output of this layer.
-        learning_rate : float
+        learning_rate: float
             Learning rate used to update weights and biases.
 
         Returns

@@ -15,9 +15,16 @@ class LossFunction(ABC):
     """
 
     @abstractmethod
-    def __call__(self, x: np.ndarray) -> np.ndarray:
+    def __call__(self, y_pred: np.ndarray, y_true: np.ndarray) -> float:
         """
         Compute the loss.
+
+        Parameters
+        ----------
+        y_pred: np.ndarray
+            Predicted values of shape (n_samples, ...).
+        y_true: np.ndarray
+            True target values of shape (n_samples, ...).
 
         Returns
         -------
@@ -26,9 +33,16 @@ class LossFunction(ABC):
         """
 
     @abstractmethod
-    def derivative(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def derivative(self, y_pred: np.ndarray, y_true: np.ndarray) -> np.ndarray:
         """
         Compute the derivative of the loss with respect to predictions.
+
+        Parameters
+        ----------
+        y_pred: np.ndarray
+            Predicted values.
+        y_true: np.ndarray
+            True values.
 
         Returns
         -------
@@ -45,15 +59,15 @@ class MSE(LossFunction):
     and its derivative.
     """
 
-    def __call__(self, y_pred: np.ndarray, y_true: np.ndarray) -> np.ndarray:
+    def __call__(self, y_pred: np.ndarray, y_true: np.ndarray) -> float:
         """
         Compute the mean squared error.
 
         Parameters
         ----------
-        y_pred : np.ndarray
+        y_pred: np.ndarray
             Predicted values of shape (n_samples, ...).
-        y_true : np.ndarray
+        y_true: np.ndarray
             True target values of shape (n_samples, ...).
 
         Returns
@@ -63,15 +77,15 @@ class MSE(LossFunction):
         """
         return np.mean((y_pred - y_true) ** 2)
 
-    def derivative(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def derivative(self, y_pred: np.ndarray, y_true: np.ndarray) -> np.ndarray:
         """
         Compute the gradient of the MSE with respect to predictions.
 
         Parameters
         ----------
-        y_pred : np.ndarray
+        y_pred: np.ndarray
             Predicted values.
-        y_true : np.ndarray
+        y_true: np.ndarray
             True values.
 
         Returns
@@ -79,6 +93,59 @@ class MSE(LossFunction):
         np.ndarray
             Gradient of the MSE with respect to y_pred.
         """
-        return 2 * (x - y) / y.shape[0]
+        return 2 * (y_pred - y_true) / y_true.shape[0]
 
 MSE = MSE()
+
+
+class BinaryCrossEntropy(LossFunction):
+    """
+    Binary Cross Entropy loss function.
+
+    Computes the binary cross entropy between predicted and true values,
+    and its derivative.
+    """
+
+    def __call__(self, y_pred: np.ndarray, y_true: np.ndarray) -> float:
+        """
+        Compute the binary cross entropy.
+
+        Parameters
+        ----------
+        y_pred: np.ndarray
+            Predicted values of shape (n_samples, ...).
+        y_true: np.ndarray
+            True target values of shape (n_samples, ...).
+
+        Returns
+        -------
+        float
+            Binary cross entropy.
+        """
+        y_true = y_true.reshape(y_pred.shape)
+        eps = 1e-12
+        y_pred = np.clip(y_pred, eps, 1 - eps)
+        return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+    def derivative(self, y_pred: np.ndarray, y_true: np.ndarray) -> np.ndarray:
+        """
+        Compute the gradient of the binary cross entropy with respect to predictions.
+
+        Parameters
+        ----------
+        y_pred: np.ndarray
+            Predicted values.
+        y_true: np.ndarray
+            True values.
+
+        Returns
+        -------
+        np.ndarray
+            Gradient of the binary cross entropy with respect to y_pred.
+        """
+        y_true = y_true.reshape(y_pred.shape)
+        eps = 1e-12
+        y_pred = np.clip(y_pred, eps, 1 - eps)
+        return (y_pred - y_true) / (y_pred * (1 - y_pred) * y_true.shape[0])
+
+BinaryCrossEntropy = BinaryCrossEntropy()

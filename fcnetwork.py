@@ -16,7 +16,7 @@ class FullyConnectedNetwork:
 
     Attributes
     ----------
-    layers : list[Layer]
+    layers: list[Layer]
         List of layers in the network in forward order.
     """
 
@@ -26,7 +26,7 @@ class FullyConnectedNetwork:
 
         Parameters
         ----------
-        layers : list[Layer]
+        layers: list[Layer]
             List of Layer objects representing the layers of the network.
         """
         self.layers = layers
@@ -37,7 +37,7 @@ class FullyConnectedNetwork:
 
         Parameters
         ----------
-        x : np.ndarray
+        x: np.ndarray
             Input data of shape (n_samples, n_features).
 
         Returns
@@ -56,9 +56,9 @@ class FullyConnectedNetwork:
 
         Parameters
         ----------
-        dloss : np.ndarray
+        dloss: np.ndarray
             Gradient of the loss function with respect to the network output.
-        learning_rate : float
+        learning_rate: float
             Learning rate for weight updates.
         """
         grad = dloss
@@ -67,8 +67,8 @@ class FullyConnectedNetwork:
 
     def fit(
             self,
-            x: np.ndarray,
-            y: np.ndarray,
+            train_set: 'tuple[np.ndarray, np.ndarray]',
+            val_set: 'tuple[np.ndarray, np.ndarray]',
             epochs: int,
             learning_rate: float,
             loss: LossFunction):
@@ -77,24 +77,26 @@ class FullyConnectedNetwork:
 
         Parameters
         ----------
-        x : np.ndarray
-            Input data of shape (n_samples, n_features).
-        y : np.ndarray
-            Target labels.
-        epochs : int
-            Number of iterations over the dataset.
-        learning_rate : float
-            Learning rate for weight updates.
-        loss : LossFunction
-            Loss function object to use during training.
-
-        Prints
-        ------
-        Loss value at each epoch.
+        train_set: tuple[np.ndarray, np.ndarray]
+            Tuple (x_train, y_train) with training data and labels.
+        val_set: tuple[np.ndarray, np.ndarray]
+            Tuple (x_val, y_val) with validation data and labels, or None if no validation is used.
+        epochs: int
+            Number of training epochs.
+        learning_rate: float
+            Step size for parameter updates.
+        loss: LossFunction
+            Loss function instance with __call__ and derivative methods.
         """
+        x_train, y_train = train_set
         for epoch in range(epochs):
-            y_pred = self.predict(x)
-            loss_val = loss(y_pred, y)
-            dloss = loss.derivative(y_pred, y)
+            y_pred = self.predict(x_train)
+            loss_value = loss(y_pred, y_train)
+            dloss = loss.derivative(y_pred, y_train)
             self._backward(dloss, learning_rate)
-            print(f'Epoch {epoch} - Loss: {loss_val}')
+            if val_set:
+                y_pred_test = self.predict(val_set[0])
+                loss_value_val = loss(y_pred_test, val_set[1])
+                print(f'Epoch {epoch} - Loss: {loss_value} - Loss (val): {loss_value_val}')
+            else:
+                print(f'Epoch {epoch} - Loss: {loss_value}')
